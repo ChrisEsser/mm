@@ -26,6 +26,7 @@
         var table = new tableData('#categoryTable', {
             url: '/app-data/categories',
             sort: {first_name: 'ASC'},
+            pageLength: 20,
             columns: [
                 {col: 'primary_desc'},
                 {col: 'detail_desc'},

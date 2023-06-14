@@ -4,7 +4,7 @@
 
 <h1 class="page_header">Reports</h1>
 
-<div class="mb-5">
+<div class="mb-4">
 
     <div class="row">
         <div class="col-sm-3 mb-2">
@@ -99,6 +99,7 @@
     box-shadow: 0px 1px 22px -12px #607D8B;
     background-color: #fff;
     padding: 25px 35px 25px 30px;
+    height: 100%;
 }
 </style>
 
@@ -110,18 +111,21 @@
 <!--<div style="width: 100%; background-color: #eff4f7;">-->
 <div style="width: 100%; ">
 
-    <div class="row sparkboxes mb-4">
+    <div class="row sparkboxes mb-4 d-flex">
+
         <div class="col-md-4">
             <div class="box box1">
                 <div id="balanceChart"></div>
 <!--                div id="profitChart"></div>-->
             </div>
         </div>
+
         <div class="col-md-4">
             <div class="box box2">
                 <div id="revenueChart"></div>
             </div>
         </div>
+
         <div class="col-md-4">
             <div class="box box3">
                 <div id="expenseChart"></div>
@@ -129,7 +133,7 @@
         </div>
     </div>
 
-    <div class="row mt-5 mb-4">
+    <div class="row mb-4 d-flex">
         <div class="col-md-6">
             <div class="box">
                 <div id="pieChart"></div>
@@ -310,7 +314,7 @@
                 }
             },
             subtitle: {
-                text: 'Total Balance',
+                text: 'Total Revenue',
                 offsetX: 30,
                 style: {
                     fontSize: '14px',
@@ -360,15 +364,13 @@
             colors: colorPalette,
             title: {
                 text: 'Percent of Spending',
-                style: {
-                    fontSize: '18px'
-                }
+                align: 'left'
             },
             series: series,
             labels: labels,
             legend: {
-                position: 'left',
-                offsetY: 80
+                position: 'top',
+                // offsetY: 80
             }
         }
 
@@ -598,14 +600,6 @@
             series: series,
             chart: {
                 type: 'line',
-                dropShadow: {
-                    enabled: true,
-                    color: '#000',
-                    top: 18,
-                    left: 7,
-                    blur: 10,
-                    opacity: 0.2
-                },
                 toolbar: {
                     show: false
                 }

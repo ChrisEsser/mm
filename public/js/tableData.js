@@ -339,7 +339,7 @@ class tableData
         newHtml += '<div class="col-auto">';
         newHtml += '<select class="form-control" id="' + this.id + '_perPage" style="max-width: 62px">';
 
-        let pageLength = (typeof this.config.pageLength == 'bigint') ? this.config.pageLength : 10;
+        let pageLength = (typeof this.config.pageLength == 'number') ? this.config.pageLength : 10;
 
         // override the page length if the user as already set the length this session
         if (sessionStorage.getItem(this.id + '_pageLength')) {
