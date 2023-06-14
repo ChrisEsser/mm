@@ -104,6 +104,7 @@ class ReportController extends BaseController
                 FROM categories c 
                 INNER JOIN transactions t ON t.category_id = c.category_id
                 WHERE c.primary_desc NOT LIKE \'%INCOME%\' AND t.date >= \'' . $start . '\' AND t.date <= \'' . $end . '\'
+                    AND c.primary_desc NOT LIKE \'TRANSFER_%\' 
                 GROUP BY ' . $groupField;
 
         return $db->rows($sql);
@@ -124,6 +125,7 @@ class ReportController extends BaseController
                     FROM transactions t
                     INNER JOIN categories c ON t.category_id = c.category_id
                     WHERE t.date >= \'' . $start . '\' AND t.date <= \'' . $end . '\' AND c.primary_desc NOT LIKE \'%INCOME%\'
+                        AND c.primary_desc NOT LIKE \'TRANSFER_%\' 
                     GROUP BY day, ' . $categoryGroupField;
 
             $result = $db->rows($sql);
@@ -150,6 +152,7 @@ class ReportController extends BaseController
                     FROM transactions t
                     INNER JOIN categories c ON t.category_id = c.category_id
                     WHERE t.date >= \'' . $start . '\' AND t.date <= \'' . $end . '\' AND c.primary_desc NOT LIKE \'%INCOME%\'
+                        AND c.primary_desc NOT LIKE \'TRANSFER_%\' 
                     GROUP BY month, ' . $categoryGroupField;
 
             $result = $db->rows($sql);
@@ -190,6 +193,7 @@ class ReportController extends BaseController
                     FROM transactions t
                     INNER JOIN categories c ON t.category_id = c.category_id
                     WHERE t.date >= \'' . $start . '\' AND t.date <= \'' . $end . '\'
+                        AND c.primary_desc NOT LIKE \'TRANSFER_%\' 
                     GROUP BY day';
 
             $result = $db->rows($sql);
@@ -220,6 +224,7 @@ class ReportController extends BaseController
                     FROM transactions t
                     INNER JOIN categories c ON t.category_id = c.category_id
                     WHERE t.date >= \'' . $start . '\' AND t.date <= \'' . $end . '\'
+                        AND c.primary_desc NOT LIKE \'TRANSFER_%\' 
                     GROUP BY month';
 
             $result = $db->rows($sql);
