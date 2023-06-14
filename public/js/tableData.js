@@ -252,23 +252,35 @@ class tableData
         // $('#' + this.id + '_tableData_container .showing_counts strong:last-child').text(total);
     }
 
-    updatePaginationDisplay(page, pages)
+    updatePaginationDisplay(currentPage, totalPages)
     {
+
+        var numVisiblePages = 11; // Number of visible pages in pagination
+
         let html = '';
-        if (pages > 1) {
-            if (page > 1) {
-                let prev = parseInt(page) - 1;
-                html += '<li class="page-item"><a class="page-link page_prev_trigger" data-page="' + prev + '" href="javascript:void(0);"><span aria-hidden="true">&laquo;</span></a></li>';
-            }
-            for (let i = 1; i <= pages; i++) {
-                let uid = this.id + '_paginate_page_' + i;
-                html += '<li class="page-item' + ((page == i) ? ' active' : '') + '"><a class="page-link page_trigger" id="' + uid + '" data-page="' + i + '" href="javascript:void(0);">' + i + '</a></li>';
-            }
-            if (page < pages) {
-                let next = parseInt(page) + 1;
-                html += '<li class="page-item"><a class="page-link page_next_trigger" data-page="' + next + '" href="javascript:void(0);"><span aria-hidden="true">&raquo;</span></a></li>';
-            }
+        var active = '';
+        var startPage = Math.max(currentPage - Math.floor(numVisiblePages / 2), 1);
+        var endPage = Math.min(startPage + numVisiblePages - 1, totalPages);
+
+        // Previous arrow
+        if (currentPage > 1) {
+            html += '<li class="page-item"><a class="page-link page_prev_trigger" href="#" data-page="' + (currentPage - 1) + '">&laquo;</a></li>';
         }
+
+        // Pagination links
+        for (var page = startPage; page <= endPage; page++) {
+            active = '';
+            if (page === currentPage) {
+                active = 'active';
+            }
+            html += '<li class="page-item"><a class="page-link page_trigger ' + active + '" href="#" data-page="' + page + '">' + page + '</a></li>';
+        }
+
+        // Next arrow
+        if (currentPage < totalPages) {
+            html += '<li class="page-item"><a class="page-link page_next_trigger" href="#" data-page="' + (currentPage + 1) + '">&raquo;</a></li>';
+        }
+
         $('#' + this.id + '_paginate1 ul.pagination').html(html);
         $('#' + this.id + '_paginate2 ul.pagination').html(html);
     }
