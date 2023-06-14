@@ -42,8 +42,8 @@ class ReportController extends BaseController
                 $start = date('Y-m-d', strtotime("$year-$firstMonth-01"));
                 $end = date('Y-m-t', strtotime("$year-$lastMonth-01"));
             } else if ($mode == 'all') {
-                $start = date('Y-01-01', strtotime("1900-01-01"));
-                $end = date('Y-12-t', time());
+                $start = date('Y-01-01', 0);
+                $end = date('Y-m-d', time());
             }
 
             $data = [];
