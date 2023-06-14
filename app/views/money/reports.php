@@ -12,7 +12,7 @@
             <select class="form-control param_change" id="mode">
                 <option value="month">Month</option>
                 <option value="quarter">Quarter</option>
-                <option value="year">Year</option>
+                <option value="year" selected>Year</option>
             </select>
         </div>
         <div class="col-sm-3 mb-2">
