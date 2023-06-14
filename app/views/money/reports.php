@@ -166,6 +166,7 @@
 <script>
 
     var pieChart = {};
+    var balanceChart = {};
     var revenueChart = {};
     var expenseCahrt = {};
     var profitChart = {};
@@ -268,14 +269,8 @@
 
         let series = [];
         let labels = [];
-        let total = data;
-        // for (let label in data) {
-        //     if (data.hasOwnProperty(label)) {
-        //         series.push(parseFloat(data[label].income));
-        //         total += parseFloat(data[label].income);
-        //         labels.push(label);
-        //     }
-        // }
+        let total = parseFloat(data.amount);
+        let lastSynced = data.date;
 
         var options = {
             chart: {
@@ -298,12 +293,6 @@
                 data: series
             }],
             labels: labels,
-            yaxis: {
-                min: 0
-            },
-            xaxis: {
-                type: 'datetime',
-            },
             colors: ['#DCE6EC'],
             title: {
                 text: total.toLocaleString('en-US', { style: 'currency', currency: 'USD' }),
@@ -314,7 +303,7 @@
                 }
             },
             subtitle: {
-                text: 'Total Revenue',
+                text: 'Current Balance',
                 offsetX: 30,
                 style: {
                     fontSize: '14px',
@@ -323,7 +312,7 @@
             }
         }
 
-        revenueChart = new ApexCharts(document.querySelector("#balanceChart"), options).render();
+        balanceChart = new ApexCharts(document.querySelector("#balanceChart"), options).render();
 
     }
 
@@ -344,7 +333,6 @@
             chart: {
                 type: 'donut',
                 width: '100%',
-                height: 400
             },
             dataLabels: {
                 enabled: false,
@@ -600,6 +588,7 @@
             series: series,
             chart: {
                 type: 'line',
+                width: '100%',
                 toolbar: {
                     show: false
                 }

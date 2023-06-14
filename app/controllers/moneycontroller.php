@@ -93,10 +93,32 @@ class MoneyController extends BaseController
         } while ($hasMore);
 
         if ($cursor) {
-
             $userPlaid->next_cursor = $cursor;
             $userPlaid->save();
+        }
 
+        // now update the current balance record
+        $response = $plaid->accounts->getBalance($decryptedToken);
+        $totalBalance = 0;
+
+        foreach ($response->accounts as $account) {
+            $totalBalance += $account->balances->current;
+        }
+
+        $db = new StandardQuery();
+
+        $sql = 'SELECT amount FROM user_balances WHERE user_id = ' . $loggedInUser . ' ORDER BY date DESC LIMIT 1';
+
+        $currentBalance = 0;
+        foreach ($db->rows($sql) as $row) {
+            $currentBalance = $row->amount;
+            break;
+        }
+
+        if ($currentBalance != $totalBalance) {
+            $sql = 'INSERT INTO user_balances (user_id, amount, date) 
+                    VALUES (' . $loggedInUser . ', ' . $totalBalance . ', CURRENT_TIMESTAMP)';
+            $db->run($sql);
         }
 
         HTTP::redirect('/money/transactions');

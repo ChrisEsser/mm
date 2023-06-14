@@ -47,7 +47,7 @@ class ReportController extends BaseController
             $data['categorySpending'] = $this->getCategorySpending($start, $end, $group);
             $data['categorySpendingGrouped'] = $this->getCategorySpendingGrouped($start, $end, $group, $mode);
             $data['expenseRevenue'] = $this->getExpenseRevenueData($start, $end, $mode);
-            $data['balance'] = 0;
+            $data['balance'] = $this->getBalance();
 
             $return = [
                 'result' => 'success',
@@ -66,9 +66,32 @@ class ReportController extends BaseController
 
     }
 
-    private function getBalance($start, $end)
+    private function getBalance()
     {
+        $db = new StandardQuery();
+        $loggedInUser = Auth::loggedInUser();
 
+        $sql = 'SELECT amount, date 
+                FROM user_balances 
+                WHERE user_id = ' . $loggedInUser . '
+                ORDER BY date DESC 
+                LIMIT 1';
+
+        $result = $db->rows($sql);
+
+        $return = [
+            'date' => 'never',
+            'amount' => 0,
+        ];
+        foreach ($result as $row) {
+            $return = [
+                'date' => $row->date,
+                'amount' => $row->amount,
+            ];
+            break;
+        }
+
+        return $return;
     }
 
     private function getCategorySpending($start, $end, $group)
