@@ -222,6 +222,7 @@ class ReportController extends BaseController
                         SUM(CASE WHEN c.primary_desc NOT LIKE \'%INCOME%\' AND c.detail_desc NOT LIKE \'%ACCOUNT_TRANSFER%\' THEN t.amount ELSE 0 END) AS expense_amount
                     FROM transactions t
                     INNER JOIN categories c ON t.category_id = c.category_id
+                    WHERE t.date >= \'' . $start . '\' AND t.date <= \'' . $end . '\'
                     GROUP BY month';
 
             $result = $db->rows($sql);
