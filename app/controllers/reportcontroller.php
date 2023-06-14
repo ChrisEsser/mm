@@ -25,7 +25,7 @@ class ReportController extends BaseController
         try {
 
             $group = $_GET['group'] ?? 'primary';
-            $mode = $_GET['mode'] ?? 'month';
+            $mode = $_GET['mode'] ?? 'year';
             $year = $_GET['year'] ?? date('Y');
 
             if ($mode == 'month') {
