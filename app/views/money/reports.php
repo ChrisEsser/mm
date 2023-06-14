@@ -423,7 +423,7 @@
                 }
             },
             subtitle: {
-                text: 'Total Revenue',
+                text: 'Total Income',
                 offsetX: 30,
                 style: {
                     fontSize: '14px',
