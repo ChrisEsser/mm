@@ -105,7 +105,7 @@ class TableDataController extends BaseController
 
         foreach ($this->sort as $sort) {
             foreach ($sort as $col => $dir) {
-                if (in_array($col, ['title', 'amount', 'type'])) {
+                if (in_array($col, ['date', 'title', 'amount', 'type'])) {
                     $order[$col] = $col . ' ' . $dir;
                 } else if ($col == 'category') {
                     $order[$col] =  ' c.detail_desc ' . $dir;
