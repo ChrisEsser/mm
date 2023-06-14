@@ -68,7 +68,7 @@ class ReportController extends BaseController
 
     private function getBalance($start, $end)
     {
-        
+
     }
 
     private function getCategorySpending($start, $end, $group)
