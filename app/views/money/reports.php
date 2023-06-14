@@ -16,7 +16,7 @@
                 <option value="all">All</option>
             </select>
         </div>
-        <div class="col-sm-3 mb-2">
+        <div class="col-sm-3 mb-2" id="year_container">
             <label for="year" class="form-label mb-0">Year</label>
             <select class="form-control param_change" id="year">
                 <?php for ($i = date('Y'); $i >= date('Y') - 7; $i--) { ?>
@@ -224,6 +224,8 @@
 
         $('#period').empty();
 
+        $('#year_container').show();
+
         const mode = $('#mode').val();
         if (mode == 'month') {
             $('#period_label').text('Month');
@@ -242,8 +244,10 @@
                 $('#period').append('<option value="' + i + '" ' + ((currentQuarter == i) ? 'selected' : '') + '>' + i + '</option>');
             }
             $('#period_container').show();
-        } else if (mode == 'year' || mode == 'all') {
+        } else if (mode == 'year') {
             $('#period_container').hide();
+        } else if (mode == 'all') {
+            $('#year_container').hide();
         }
 
         if (typeof callback == 'function') {
