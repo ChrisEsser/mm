@@ -188,12 +188,11 @@ class ReportController extends BaseController
             }
 
             $sql = 'SELECT DATE(t.date) AS day,
-                        SUM(CASE WHEN c.primary_desc LIKE \'%INCOME%\' THEN t.amount ELSE 0 END) AS income_amount,
-                        SUM(CASE WHEN c.primary_desc NOT LIKE \'%INCOME%\' THEN t.amount ELSE 0 END) AS expense_amount
+                        SUM(CASE WHEN c.primary_desc LIKE \'%INCOME%\' AND c.detail_desc NOT LIKE \'%ACCOUNT_TRANSFER%\' THEN t.amount ELSE 0 END) AS income_amount,
+                        SUM(CASE WHEN c.primary_desc NOT LIKE \'%INCOME%\' AND c.detail_desc NOT LIKE \'%ACCOUNT_TRANSFER%\' THEN t.amount ELSE 0 END) AS expense_amount
                     FROM transactions t
                     INNER JOIN categories c ON t.category_id = c.category_id
                     WHERE t.date >= \'' . $start . '\' AND t.date <= \'' . $end . '\'
-                        AND c.detail_desc NOT LIKE \'%ACCOUNT_TRANSFER%\' 
                     GROUP BY day';
 
             $result = $db->rows($sql);
@@ -219,11 +218,10 @@ class ReportController extends BaseController
             }
 
             $sql = 'SELECT DATE_FORMAT(t.date, \'%Y-%m\') AS month, 
-                        SUM(CASE WHEN c.primary_desc LIKE \'%INCOME%\' THEN t.amount ELSE 0 END) AS income_amount,
-                        SUM(CASE WHEN c.primary_desc NOT LIKE \'%INCOME%\' THEN t.amount ELSE 0 END) AS expense_amount
+                        SUM(CASE WHEN c.primary_desc LIKE \'%INCOME%\' AND c.detail_desc NOT LIKE \'%ACCOUNT_TRANSFER%\' THEN t.amount ELSE 0 END) AS income_amount,
+                        SUM(CASE WHEN c.primary_desc NOT LIKE \'%INCOME%\' AND c.detail_desc NOT LIKE \'%ACCOUNT_TRANSFER%\' THEN t.amount ELSE 0 END) AS expense_amount
                     FROM transactions t
                     INNER JOIN categories c ON t.category_id = c.category_id
-                        AND c.detail_desc NOT LIKE \'%ACCOUNT_TRANSFER%\' 
                     GROUP BY month';
 
             $result = $db->rows($sql);
