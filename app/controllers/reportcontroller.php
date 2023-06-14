@@ -25,7 +25,7 @@ class ReportController extends BaseController
         try {
 
             $group = $_GET['group'] ?? 'primary';
-            $mode = $_GET['mode'] ?? 'month';
+            $mode = $_GET['mode'] ?? 'year';
             $year = $_GET['year'] ?? date('Y');
 
             if ($mode == 'month') {
@@ -41,6 +41,9 @@ class ReportController extends BaseController
                 $lastMonth = $firstMonth + 2;
                 $start = date('Y-m-d', strtotime("$year-$firstMonth-01"));
                 $end = date('Y-m-t', strtotime("$year-$lastMonth-01"));
+            } else if ($mode == 'all') {
+                $start = date('Y-01-01', strtotime("1900-01-01"));
+                $end = date('Y-12-t', time());
             }
 
             $data = [];

@@ -13,6 +13,7 @@
                 <option value="month">Month</option>
                 <option value="quarter">Quarter</option>
                 <option value="year" selected>Year</option>
+                <option value="all">All</option>
             </select>
         </div>
         <div class="col-sm-3 mb-2">
@@ -241,7 +242,7 @@
                 $('#period').append('<option value="' + i + '" ' + ((currentQuarter == i) ? 'selected' : '') + '>' + i + '</option>');
             }
             $('#period_container').show();
-        } else if (mode == 'year') {
+        } else if (mode == 'year' || mode == 'all') {
             $('#period_container').hide();
         }
 
