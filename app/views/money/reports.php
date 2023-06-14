@@ -376,10 +376,12 @@
         let series = [];
         let labels = [];
         let total = 0.0;
+        let tmpValue = 0;
         for (let label in data) {
             if (data.hasOwnProperty(label)) {
-                series.push(parseFloat(data[label].income));
-                total += parseFloat(data[label].income);
+                tmpValue = parseFloat(data[label].income) * -1;
+                series.push(tmpValue);
+                total += tmpValue;
                 labels.push(label);
             }
         }
