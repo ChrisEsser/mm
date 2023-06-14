@@ -104,7 +104,7 @@ class ReportController extends BaseController
                 FROM categories c 
                 INNER JOIN transactions t ON t.category_id = c.category_id
                 WHERE c.primary_desc NOT LIKE \'%INCOME%\' AND t.date >= \'' . $start . '\' AND t.date <= \'' . $end . '\'
-                    AND c.primary_desc NOT LIKE \'TRANSFER_%\' 
+                    AND c.detail_desc NOT LIKE \'ACCOUNT_TRANSFER%\' 
                 GROUP BY ' . $groupField;
 
         return $db->rows($sql);
@@ -125,7 +125,7 @@ class ReportController extends BaseController
                     FROM transactions t
                     INNER JOIN categories c ON t.category_id = c.category_id
                     WHERE t.date >= \'' . $start . '\' AND t.date <= \'' . $end . '\' AND c.primary_desc NOT LIKE \'%INCOME%\'
-                        AND c.primary_desc NOT LIKE \'TRANSFER_%\' 
+                        AND c.detail_desc NOT LIKE \'ACCOUNT_TRANSFER%\' 
                     GROUP BY day, ' . $categoryGroupField;
 
             $result = $db->rows($sql);
@@ -152,7 +152,7 @@ class ReportController extends BaseController
                     FROM transactions t
                     INNER JOIN categories c ON t.category_id = c.category_id
                     WHERE t.date >= \'' . $start . '\' AND t.date <= \'' . $end . '\' AND c.primary_desc NOT LIKE \'%INCOME%\'
-                        AND c.primary_desc NOT LIKE \'TRANSFER_%\' 
+                        AND c.detail_desc NOT LIKE \'ACCOUNT_TRANSFER%\' 
                     GROUP BY month, ' . $categoryGroupField;
 
             $result = $db->rows($sql);
@@ -193,7 +193,7 @@ class ReportController extends BaseController
                     FROM transactions t
                     INNER JOIN categories c ON t.category_id = c.category_id
                     WHERE t.date >= \'' . $start . '\' AND t.date <= \'' . $end . '\'
-                        AND c.primary_desc NOT LIKE \'TRANSFER_%\' 
+                        AND c.detail_desc NOT LIKE \'ACCOUNT_TRANSFER%\' 
                     GROUP BY day';
 
             $result = $db->rows($sql);
@@ -223,7 +223,7 @@ class ReportController extends BaseController
                         SUM(CASE WHEN c.primary_desc NOT LIKE \'%INCOME%\' THEN t.amount ELSE 0 END) AS expense_amount
                     FROM transactions t
                     INNER JOIN categories c ON t.category_id = c.category_id
-                        AND c.primary_desc NOT LIKE \'TRANSFER_%\' 
+                        AND c.detail_desc NOT LIKE \'ACCOUNT_TRANSFER%\' 
                     GROUP BY month';
 
             $result = $db->rows($sql);
