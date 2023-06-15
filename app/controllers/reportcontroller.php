@@ -106,8 +106,8 @@ class ReportController extends BaseController
         $sql = 'SELECT SUM(t.amount) AS amount, ' . $groupField . ' AS description
                 FROM categories c 
                 INNER JOIN transactions t ON t.category_id = c.category_id
-                WHERE c.primary_desc NOT LIKE \'%INCOME%\' AND t.date >= \'' . $start . '\' AND t.date <= \'' . $end . '\'
-                    AND c.detail_desc NOT LIKE \'%ACCOUNT_TRANSFER%\' 
+                WHERE c.primary_desc NOT LIKE \'%income%\' AND t.date >= \'' . $start . '\' AND t.date <= \'' . $end . '\'
+                    AND c.detail_desc NOT LIKE \'%account transfer%\' 
                 GROUP BY ' . $groupField;
 
         return $db->rows($sql);
@@ -127,8 +127,8 @@ class ReportController extends BaseController
             $sql = 'SELECT DATE(t.date) AS day, ' . $categoryGroupField . ' AS label, SUM(t.amount) as amount
                     FROM transactions t
                     INNER JOIN categories c ON t.category_id = c.category_id
-                    WHERE t.date >= \'' . $start . '\' AND t.date <= \'' . $end . '\' AND c.primary_desc NOT LIKE \'%INCOME%\'
-                        AND c.detail_desc NOT LIKE \'%ACCOUNT_TRANSFER%\' 
+                    WHERE t.date >= \'' . $start . '\' AND t.date <= \'' . $end . '\' AND c.primary_desc NOT LIKE \'%income%\'
+                        AND c.detail_desc NOT LIKE \'%account transfer%\' 
                     GROUP BY day, ' . $categoryGroupField;
 
             $result = $db->rows($sql);
@@ -154,8 +154,8 @@ class ReportController extends BaseController
             $sql = 'SELECT DATE_FORMAT(t.date, \'%Y-%m\') AS month, ' . $categoryGroupField . ' AS label, SUM(t.amount) AS amount
                     FROM transactions t
                     INNER JOIN categories c ON t.category_id = c.category_id
-                    WHERE t.date >= \'' . $start . '\' AND t.date <= \'' . $end . '\' AND c.primary_desc NOT LIKE \'%INCOME%\'
-                        AND c.detail_desc NOT LIKE \'%ACCOUNT_TRANSFER%\' 
+                    WHERE t.date >= \'' . $start . '\' AND t.date <= \'' . $end . '\' AND c.primary_desc NOT LIKE \'%income%\'
+                        AND c.detail_desc NOT LIKE \'%account transfer%\' 
                     GROUP BY month, ' . $categoryGroupField;
 
             $result = $db->rows($sql);
@@ -191,8 +191,8 @@ class ReportController extends BaseController
             }
 
             $sql = 'SELECT DATE(t.date) AS day,
-                        SUM(CASE WHEN c.primary_desc LIKE \'%INCOME%\' AND c.detail_desc NOT LIKE \'%ACCOUNT_TRANSFER%\' THEN t.amount ELSE 0 END) AS income_amount,
-                        SUM(CASE WHEN c.primary_desc NOT LIKE \'%INCOME%\' AND c.detail_desc NOT LIKE \'%ACCOUNT_TRANSFER%\' THEN t.amount ELSE 0 END) AS expense_amount
+                        SUM(CASE WHEN c.primary_desc LIKE \'%income%\' AND c.detail_desc NOT LIKE \'%account transfer%\' THEN t.amount ELSE 0 END) AS income_amount,
+                        SUM(CASE WHEN c.primary_desc NOT LIKE \'%income%\' AND c.detail_desc NOT LIKE \'%account transfer%\' THEN t.amount ELSE 0 END) AS expense_amount
                     FROM transactions t
                     INNER JOIN categories c ON t.category_id = c.category_id
                     WHERE t.date >= \'' . $start . '\' AND t.date <= \'' . $end . '\'
@@ -221,8 +221,8 @@ class ReportController extends BaseController
             }
 
             $sql = 'SELECT DATE_FORMAT(t.date, \'%Y-%m\') AS month, 
-                        SUM(CASE WHEN c.primary_desc LIKE \'%INCOME%\' AND c.detail_desc NOT LIKE \'%ACCOUNT_TRANSFER%\' THEN t.amount ELSE 0 END) AS income_amount,
-                        SUM(CASE WHEN c.primary_desc NOT LIKE \'%INCOME%\' AND c.detail_desc NOT LIKE \'%ACCOUNT_TRANSFER%\' THEN t.amount ELSE 0 END) AS expense_amount
+                        SUM(CASE WHEN c.primary_desc LIKE \'%income%\' AND c.detail_desc NOT LIKE \'%account transfer%\' THEN t.amount ELSE 0 END) AS income_amount,
+                        SUM(CASE WHEN c.primary_desc NOT LIKE \'%income%\' AND c.detail_desc NOT LIKE \'%account transfer%\' THEN t.amount ELSE 0 END) AS expense_amount
                     FROM transactions t
                     INNER JOIN categories c ON t.category_id = c.category_id
                     WHERE t.date >= \'' . $start . '\' AND t.date <= \'' . $end . '\'
