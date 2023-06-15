@@ -338,6 +338,7 @@
             chart: {
                 type: 'donut',
                 width: '100%',
+                height: '400px',
             },
             dataLabels: {
                 enabled: false,
@@ -596,6 +597,7 @@
             chart: {
                 type: 'line',
                 width: '100%',
+                height: '400px',
                 toolbar: {
                     show: false
                 }
@@ -625,11 +627,17 @@
                 categories: [],
                 title: {
                     text: (mode == 'month') ? 'Day' : 'Month'
+                },
+                labels: {
+                    show: false
                 }
             },
             yaxis: {
                 title: {
                     text: 'Spent'
+                },
+                labels: {
+                    show: false  // Hide x-axis labels
                 }
             },
             legend: {

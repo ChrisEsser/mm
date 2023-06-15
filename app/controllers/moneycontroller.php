@@ -47,7 +47,7 @@ class MoneyController extends BaseController
         if (!empty($_POST['copy_merchant'])) {
 
             // update all other transactions with this merchant to also be this category
-            Transaction::find(['merchant' => $_POST['merchant']])
+            Transaction::find(['merchant' => $_POST['merchant'], 'category_id' => 0])
                 ->update(['category_id' => $_POST['category_id']]);
             // save a link in the matrix for future transactions with merchant to default to this category
             $matrix = new CategoryMatrix();
@@ -93,7 +93,7 @@ class MoneyController extends BaseController
             }
 
             if (!empty($toUpdate)) {
-                $sql = 'UPDATE transactions SET category_id = ' . $_POST['category_id'] . ' WHERE transaction_id IN (' . implode(',', $toUpdate) . ') ';
+                $sql = 'UPDATE transactions SET category_id = ' . $_POST['category_id'] . ' WHERE category_id = 0 AND transaction_id IN (' . implode(',', $toUpdate) . ') ';
                 $db->run($sql);
             }
 
@@ -130,6 +130,7 @@ class MoneyController extends BaseController
 
             foreach ($response->added as $new) {
 
+                $categoryId = 0;
                 foreach ($categoryMatrix as $category) {
                     if ($category->merchant == $new->merchant_name) {
                         $categoryId = $category->category_id;
