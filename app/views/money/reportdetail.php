@@ -81,8 +81,6 @@ $start = date('M 01 Y', strtotime('-1 year', strtotime($end)));
         let url = '/reports/get-data-detail';
         url += '?<?=($merchant) ? 'merchant=' . urlencode($merchant) : 'title=' . urlencode($title)?>';
 
-        alert(url);
-
         $.get(url)
             .done(function(result) {
                 result = JSON.parse(result);
