@@ -248,6 +248,18 @@ class MoneyController extends BaseController
         HTML::addScriptToHead('https://cdn.jsdelivr.net/npm/apexcharts');
     }
 
+    public function reportDetail()
+    {
+        $title = $_GET['title'] ?? '';
+        $merchant = $_GET['merchant'] ?? '';
+
+        HTML::addScriptToHead('https://cdn.jsdelivr.net/npm/chart.js');
+        HTML::addScriptToHead('https://cdn.jsdelivr.net/npm/apexcharts');
+
+        $this->view->setVar('title', $title);
+        $this->view->setVar('merchant', $merchant);
+    }
+
     public function settings()
     {
         $loggedInUser = Auth::loggedInUser();
@@ -333,6 +345,8 @@ class MoneyController extends BaseController
         $iv = base64_decode($userPlaid->iv);
         return openssl_decrypt($encryptedToken, 'AES-256-CBC', $_ENV['ENCRYPT_KEY'], 0, $iv);
     }
+
+
 
     private function removeNumbers($string)
     {

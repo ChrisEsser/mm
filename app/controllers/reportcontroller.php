@@ -50,7 +50,7 @@ class ReportController extends BaseController
             $data['categorySpending'] = $this->getCategorySpending($start, $end, $group);
             $data['categorySpendingGrouped'] = $this->getCategorySpendingGrouped($start, $end, $group, $mode);
             $data['expenseRevenue'] = $this->getExpenseRevenueData($start, $end, $mode);
-            $data['balance'] = $this->getBalance();
+            $data['balance'] = $this->getBalance($start, $end, $mode);
 
             $return = [
                 'result' => 'success',
@@ -69,32 +69,182 @@ class ReportController extends BaseController
 
     }
 
-    private function getBalance()
+    public function getDetailData()
     {
-        $db = new StandardQuery();
-        $loggedInUser = Auth::loggedInUser();
-
-        $sql = 'SELECT amount, date 
-                FROM user_balances 
-                WHERE user_id = ' . $loggedInUser . '
-                ORDER BY date DESC 
-                LIMIT 1';
-
-        $result = $db->rows($sql);
+        $this->render = false;
 
         $return = [
-            'date' => 'never',
-            'amount' => 0,
+            'result' => '',
+            'data' => [],
         ];
-        foreach ($result as $row) {
+
+        $title = $_GET['title'] ?? '';
+        $merchant = $_GET['merchant'] ?? '';
+
+        try {
+
+            $db = new StandardQuery();
+
+            $end = date('Y-m-t'); // Current date
+            $start = date('Y-m-01', strtotime('-1 year', strtotime($end)));
+
+            if ($merchant) {
+
+                $sql = 'SELECT t1.month,
+                           AVG(t2.amount) AS average,
+                           SUM(t2.amount) AS `sum`,
+                           COUNT(t2.amount) AS `count`
+                    FROM (
+                        SELECT DATE_FORMAT(date, \'%Y-%m\') AS month
+                        FROM transactions
+                        WHERE date BETWEEN \'' . $start . '\' AND \'' . $end . '\' AND merchant = \'' . $merchant . '\'
+                        GROUP BY month WITH ROLLUP
+                    ) AS t1
+                    INNER JOIN transactions AS t2 ON DATE_FORMAT(t2.date, \'%Y-%m\') <= t1.month
+                    GROUP BY t1.month WITH ROLLUP
+                    ORDER BY t1.month';
+
+                $data = $db->rows($sql);
+
+            } else if ($title) {
+
+                $sql = 'SELECT t1.month,
+                           AVG(t2.amount) AS average,
+                           SUM(t2.amount) AS `sum`,
+                           COUNT(t2.amount) AS `count`
+                    FROM (
+                        SELECT DATE_FORMAT(date, \'%Y-%m\') AS month
+                        FROM transactions
+                        WHERE date BETWEEN \'' . $start . '\' AND \'' . $end . '\' AND title = \'' . $title . '\'
+                        GROUP BY month WITH ROLLUP
+                    ) AS t1
+                    INNER JOIN transactions AS t2 ON DATE_FORMAT(t2.date, \'%Y-%m\') <= t1.month
+                    GROUP BY t1.month WITH ROLLUP
+                    ORDER BY t1.month';
+
+                $data = $db->rows($sql);
+
+            } else throw new Exception('Invalid request type');
+
             $return = [
-                'date' => $row->date,
-                'amount' => $row->amount,
+                'result' => 'success',
+                'data' => $data,
             ];
-            break;
+
+        } catch (Exception $e) {
+            $return = [
+                'result' => 'error',
+                'error_message' => $e->getMessage(),
+            ];
+        }
+
+        echo json_encode($return);
+        exit;
+    }
+
+    private function getBalance($start, $end, $mode)
+    {
+        $db = new StandardQuery();
+
+        $loggedInUser = Auth::loggedInUser();
+
+        // first get the current balance regardless of start and end dates
+        $sql = 'SELECT amount FROM user_balances WHERE user_id = ' . $loggedInUser . ' ORDER BY date DESC LIMIT 1';
+        $r = $db->row($sql);
+        $return['current_balance'] = (float)$r->amount;
+
+        if ($mode == 'month') {
+
+            // get all balance records for this date range
+            $sql = 'SELECT DATE(date) AS day, amount
+                    FROM user_balances 
+                    WHERE user_id = ' . $loggedInUser . '
+                        AND date >= \'' . $start . '\' AND date <= \'' . $end . '\'
+                    ORDER BY day';
+
+            $result = $db->rows($sql);
+
+            $start = new DateTime($start);
+            $end = new DateTime($end);
+            $interval = new DateInterval('P1D');
+
+            $days = [];
+            $currentDate = clone $start;
+
+            while ($currentDate <= $end) {
+                $days[$currentDate->format('Y-m-d')] = 0;
+                $currentDate->add($interval);
+            }
+
+            $previousValue = 0;
+            foreach ($days as $day => &$value) {
+
+                // find matching result
+                $matchingResult = null;
+                foreach ($result as $row) {
+                    if ($row->day == $day) {
+                        $matchingResult = $row;
+                        break;
+                    }
+                }
+
+                if ($matchingResult !== null) {
+                    $previousValue = $value = $matchingResult->amount;
+                } else {
+                    $value = $previousValue;
+                }
+            }
+
+            $return['history'] = $days;
+
+        } else {
+
+            // get all balance records for this date range
+            $sql = 'SELECT DATE_FORMAT(date, \'%Y-%m\') AS month, amount
+                    FROM user_balances 
+                    WHERE user_id = ' . $loggedInUser . '
+                        AND date >= \'' . $start . '\' AND date <= \'' . $end . '\'
+                    ORDER BY month';
+
+            $result = $db->rows($sql);
+
+            $start = new DateTime($start);
+            $end = new DateTime($end);
+            $interval = new DateInterval('P1M');
+
+            $months = [];
+            $currentDate = clone $start;
+
+            while ($currentDate <= $end) {
+                $months[$currentDate->format('Y-m')] = 0;
+                $currentDate->add($interval);
+            }
+
+            $previousValue = 0;
+            foreach ($months as $month => &$value) {
+
+                // find matching result
+                $matchingResult = null;
+                foreach ($result as $row) {
+                    if ($row->month == $month) {
+                        $matchingResult = $row;
+                        break;
+                    }
+                }
+
+                if ($matchingResult !== null) {
+                    $previousValue = $value = $matchingResult->amount;
+                } else {
+                    $value = $previousValue;
+                }
+            }
+
+
+            $return['history'] = $months;
         }
 
         return $return;
+
     }
 
     private function getCategorySpending($start, $end, $group)

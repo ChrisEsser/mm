@@ -86,18 +86,18 @@ class TableDataController extends BaseController
 
         $db = new StandardQuery();
 
-        $sql = 'SELECT t.*, IFNULL(c.detail_desc, \'\') AS category
+        $sql = 'SELECT t.transaction_id, t.title, IFNULL(t.merchant, \'\') as merchant, t.amount, t.date, IFNULL(c.detail_desc, \'\') AS category
                 FROM transactions t 
                 LEFT JOIN categories c ON c.category_id = t.category_id';
 
         $params = [];
         foreach ($this->filters as $filter) {
             foreach ($filter as $col => $value) {
-                if (in_array($col, ['title', 'amount'])) {
+                if (in_array($col, ['title', 'merchant', 'amount', 'date'])) {
                     $where[$col] = 't.' . $col . ' LIKE :' . $col;
                     $params[$col] = '%' . $value . '%';
                 } else if ($col == 'category') {
-                    $where[$col] = 'c.detail_desc LIKE :' . $col;
+                    $where[$col] = '(c.detail_desc LIKE :' . $col . ' OR c.primary_desc LIKE :' . $col . ')';
                     $params[$col] = '%' . $value . '%';
                 }
             }
@@ -105,7 +105,7 @@ class TableDataController extends BaseController
 
         foreach ($this->sort as $sort) {
             foreach ($sort as $col => $dir) {
-                if (in_array($col, ['date', 'title', 'amount', 'type'])) {
+                if (in_array($col, ['date', 'title', 'merchant', 'amount', 'type'])) {
                     $order[$col] = $col . ' ' . $dir;
                 } else if ($col == 'category') {
                     $order[$col] =  ' c.detail_desc ' . $dir;

@@ -17,8 +17,8 @@ return [
 
     ['GET', '/money/sync', 'MoneyController#sync'],
 
-
     ['GET', '/money/reports', 'MoneyController#reports'],
+    ['GET', '/money/reports/detail', 'MoneyController#reportDetail'],
 
     ['GET', '/money/settings', 'MoneyController#settings'],
     ['POST', '/money/settings/createLinkToken', 'MoneyController#createLinkToken'],
@@ -37,5 +37,6 @@ return [
     ['POST', '/app-data/transactions', 'TableDataController#transactions'],
 
     ['GET', '/reports/get-data', 'ReportController#getData'],
+    ['GET', '/reports/get-data-detail', 'ReportController#getDetailData'],
 
 ];

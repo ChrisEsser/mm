@@ -20,6 +20,7 @@
     <tr>
         <th>Date</th>
         <th>Title</th>
+        <th>Merchant</th>
         <th>Amount</th>
         <th>Category</th>
         <th></th>
@@ -38,7 +39,20 @@
             pageLength: 100,
             columns: [
                 {col: 'date', format: 'date'},
-                {col: 'title'},
+                {col: 'title',
+                    template: function(data) {
+                        if (data.title) {
+                            return '<a href="/money/reports/detail?title=' + encodeURI(data.title) + '">' + data.title + '</a>';
+                        } else return '';
+                    }
+                },
+                {col: 'merchant',
+                    template: function(data) {
+                        if (data.merchant) {
+                            return '<a href="/money/reports/detail?merchant=' + encodeURI(data.merchant) + '">' + data.merchant + '</a>';
+                        } else return '';
+                    }
+                },
                 {col: 'amount', format: 'usd'},
                 {col: 'category'},
                 {col: '', sort: false, search: false,

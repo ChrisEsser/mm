@@ -248,6 +248,70 @@ ul.pagination {
 }
 
 
+/**
+    Reports charts styles
+ */
+.box.banana_map {
+    color: #fff;
+    background: #eff4f7;
+    padding: 0;
+    box-shadow: none;
+}
+.box.banana_map .title {
+    padding-top: 40px;
+    padding-left: 25px;
+    font-size: 16px;
+}
+.box.banana_map .subtitle {
+    font-weight: 700;
+    padding-top: 10px;
+    padding-left: 25px;
+    font-size: 22px;
+}
+
+.box {
+    max-height: 444px;
+}
+
+.box .banana {
+    min-height: 404px;
+    background-image: url('/img/banana.png');
+    background-size: cover;
+}
+.box .map {
+    min-height: 404px;
+    background-image: url('/img/map.png');
+    background-size: cover;
+}
+.box .cog-icon {
+    cursor: pointer;
+    position: absolute;
+    right: 55px;
+    top: 25px;
+    z-index: 10;
+}
+
+.sparkboxes .box {
+    padding: 3px 0 0 0;
+    position: relative;
+}
+
+#revenueChart, #expenseChart, #profitChart {
+    position: relative;
+    padding-top: 15px;
+}
+/* overrides */
+.sparkboxes #apexcharts-subtitle-text { fill: #8799a2 !important; }
+
+.box {
+    box-shadow: 0px 1px 22px -12px #607D8B;
+    background-color: #fff;
+    padding: 25px 35px 25px 30px;
+    height: 100%;
+}
+/* END REPORT CHART STYLES */
+
+
 
 @media screen and (max-width: 1200px) {
     .property_image {

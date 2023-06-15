@@ -42,75 +42,8 @@
 <div class="clearfix"></div>
 
 
-<style>
-
-.box.banana_map {
-    color: #fff;
-    background: #eff4f7;
-    padding: 0;
-    box-shadow: none;
-}
-.box.banana_map .title {
-    padding-top: 40px;
-    padding-left: 25px;
-    font-size: 16px;
-}
-.box.banana_map .subtitle {
-    font-weight: 700;
-    padding-top: 10px;
-    padding-left: 25px;
-    font-size: 22px;
-}
-
-.box {
-    max-height: 444px;
-}
-
-.box .banana {
-    min-height: 404px;
-    background-image: url('/img/banana.png');
-    background-size: cover;
-}
-.box .map {
-    min-height: 404px;
-    background-image: url('/img/map.png');
-    background-size: cover;
-}
-.box .cog-icon {
-    cursor: pointer;
-    position: absolute;
-    right: 55px;
-    top: 25px;
-    z-index: 10;
-}
-
-.sparkboxes .box {
-    padding: 3px 0 0 0;
-    position: relative;
-}
-
-#revenueChart, #expenseChart, #profitChart {
-    position: relative;
-    padding-top: 15px;
-}
-/* overrides */
-.sparkboxes #apexcharts-subtitle-text { fill: #8799a2 !important; }
-
-.box {
-    box-shadow: 0px 1px 22px -12px #607D8B;
-    background-color: #fff;
-    padding: 25px 35px 25px 30px;
-    height: 100%;
-}
-</style>
-
-
-
-
-
-
 <!--<div style="width: 100%; background-color: #eff4f7;">-->
-<div style="width: 100%; ">
+<div style="width: 100%;">
 
     <div class="row sparkboxes mb-4 d-flex">
 
@@ -274,9 +207,14 @@
 
         let series = [];
         let labels = [];
-        let total = parseFloat(data.amount);
-        total += 5000;
-        let lastSynced = data.date;
+        let total = parseFloat(data.current_balance);
+
+        for (let label in data.history) {
+            if (data.history.hasOwnProperty(label)) {
+                series.push(parseFloat(data.history[label]));
+                labels.push(label);
+            }
+        }
 
         var options = {
             chart: {
@@ -295,10 +233,16 @@
                 opacity: 1,
             },
             series: [{
-                name: 'Revenue',
+                name: 'Balance',
                 data: series
             }],
             labels: labels,
+            yaxis: {
+                min: 0
+            },
+            xaxis: {
+                type: 'datetime',
+            },
             colors: ['#DCE6EC'],
             title: {
                 text: total.toLocaleString('en-US', { style: 'currency', currency: 'USD' }),
