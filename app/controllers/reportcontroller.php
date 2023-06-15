@@ -88,41 +88,31 @@ class ReportController extends BaseController
             $end = date('Y-m-t'); // Current date
             $start = date('Y-m-01', strtotime('-1 year', strtotime($end)));
 
-            if ($merchant) {
+            $field = 'merchant';
+            $value = $merchant;
+
+            if (!$merchant && $title) {
+                $value = $title;
+                $field = 'title';
+            }
+
+            if ($value) {
 
                 $sql = 'select \'\' as `month`, sum(amount) as `sum`, avg(amount) as `average`, count(amount) as `count` 
                         from transactions 
-                        where `date` >= \'' . $start . '\' and `date` <= \'' . $end . '\' and merchant = ?';
+                        where `date` >= \'' . $start . '\' and `date` <= \'' . $end . '\' and ' . $field . ' = ?';
 
-                $totals = $db->rows($sql, [$merchant]);
+                $totals = $db->rows($sql, [$value]);
 
                 $sql = 'select count(amount) as `count`, sum(amount) as `sum`, avg(amount) as `average`, DATE_FORMAT(date, \'%Y-%m\') AS month 
                         from transactions 
-                        where merchant = ? 
+                        where ' . $field . ' = ? 
                             and date >= \'' . $start . '\' AND date <= \'' . $end . '\' group by DATE_FORMAT(date, \'%Y-%m\')
                         order by DATE_FORMAT(date, \'%Y-%m\')';
 
-                $series = $db->rows($sql, [$merchant]);
+                $series = $db->rows($sql, [$value]);
 
                 $data = $totals + $series;
-
-            } else if ($title) {
-
-                $sql = 'SELECT t1.month,
-                           AVG(t2.amount) AS average,
-                           SUM(t2.amount) AS `sum`,
-                           COUNT(t2.amount) AS `count`
-                    FROM (
-                        SELECT DATE_FORMAT(date, \'%Y-%m\') AS month
-                        FROM transactions
-                        WHERE date BETWEEN \'' . $start . '\' AND \'' . $end . '\' AND title = \'' . $title . '\'
-                        GROUP BY month WITH ROLLUP
-                    ) AS t1
-                    INNER JOIN transactions AS t2 ON DATE_FORMAT(t2.date, \'%Y-%m\') <= t1.month
-                    GROUP BY t1.month WITH ROLLUP
-                    ORDER BY t1.month';
-
-                $data = $db->rows($sql);
 
             } else throw new Exception('Invalid request type');
 
