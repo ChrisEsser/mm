@@ -275,6 +275,7 @@
         let series = [];
         let labels = [];
         let total = parseFloat(data.amount);
+        total += 5000;
         let lastSynced = data.date;
 
         var options = {
