@@ -17,7 +17,7 @@ class IndexController extends BaseController
         $this->render = false;
 
         if (Auth::loggedInUser()) {
-            HTTP::redirect('/money/transactions');
+            HTTP::redirect('/money/reports');
         } else {
             HTTP::redirect('/login');
         }
