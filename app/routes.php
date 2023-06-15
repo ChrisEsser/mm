@@ -6,11 +6,17 @@ return [
     ['GET', '', 'IndexController#index'],
 
     ['GET', '/money/transactions', 'MoneyController#transactions'],
-    ['GET', '/money/sync', 'MoneyController#sync'],
+    ['GET', '/money/transactions/create', 'MoneyController#editTransaction'],
+    ['GET', '/money/transactions/edit/[i:transactionId]', 'MoneyController#editTransaction'],
+    ['POST', '/money/transactions/save', 'MoneyController#saveTransaction'],
 
     ['GET', '/money/categories', 'MoneyController#categories'],
     ['GET', '/money/categories/create', 'MoneyController#editCategory'],
     ['GET', '/money/categories/edit/[i:categoryId]', 'MoneyController#editCategory'],
+    ['POST', '/money/categories/save', 'MoneyController#saveCategory'],
+
+    ['GET', '/money/sync', 'MoneyController#sync'],
+
 
     ['GET', '/money/reports', 'MoneyController#reports'],
 

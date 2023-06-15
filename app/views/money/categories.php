@@ -4,7 +4,7 @@
 <h1 class="page_header">Categories</h1>
 
 <div class="d-grid gap-2 d-md-flex my-3 justify-content-md-end">
-    <a href="/money/category/create" role="button" class="btn btn-round btn-primary"><i class="bi bi-plus"></i>&nbsp;&nbsp;Add Category</a>
+    <a href="/money/categories/create" role="button" class="btn btn-round btn-primary"><i class="bi bi-plus"></i>&nbsp;&nbsp;Add Category</a>
 </div>
 
 <table class="e2-table" id="categoryTable">

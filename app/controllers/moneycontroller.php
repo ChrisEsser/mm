@@ -2,6 +2,8 @@
 
 class MoneyController extends BaseController
 {
+    private $similarTitleThreshold = 90;
+
     public function beforeAction()
     {
         if (empty(Auth::loggedInUser())) {
@@ -12,6 +14,93 @@ class MoneyController extends BaseController
     public function transactions()
     {
 
+    }
+
+    public function editTransaction($params)
+    {
+        $transactionId = $params['transactionId'] ?? 0;
+        $transaction = ($transactionId)
+            ? Transaction::findOne(['transaction_id' => $transactionId])
+            : new Transaction();
+
+        $categories = Category::find([], ['primary_desc' => 'ASC', 'detail_desc' => 'ASC']);
+
+        $this->view->setVar('transaction', $transaction);
+        $this->view->setVar('categories', $categories);
+    }
+
+    public function saveTransaction()
+    {
+        $this->render = false;
+
+        $transactionId = $_POST['transaction'] ?? 0;
+        $transaction = ($transactionId)
+            ? Transaction::findOne(['transaction_id' => $transactionId])
+            : new Transaction();
+
+        $transaction->title = $_POST['title'];
+        $transaction->merchant = $_POST['merchant'];
+        $transaction->amount = floatval($_POST['amount']);
+        $transaction->category_id = intval($_POST['category_id']);
+        $transaction->save();
+
+        if (!empty($_POST['copy_merchant'])) {
+
+            // update all other transactions with this merchant to also be this category
+            Transaction::find(['merchant' => $_POST['merchant']])
+                ->update(['category_id' => $_POST['category_id']]);
+            // save a link in the matrix for future transactions with merchant to default to this category
+            $matrix = new CategoryMatrix();
+            $matrix->category_id = $_POST['category_id'];
+            $matrix->merchant = $_POST['merchant'];
+            try {
+                $matrix->save();
+            } catch(Exception $e) {
+                // there is a unique constraint on this table. likely just means this already exists
+                // TODO: update this so it's not in try catch. hard to catch actual issues this way
+            }
+        }
+
+        if (!empty($_POST['copy_title'])) {
+
+            // save a link in the matrix for future transactions with merchant to default to this category
+            $matrix = new CategoryMatrix();
+            $matrix->category_id = $_POST['category_id'];
+            $matrix->title = $_POST['title'];
+            try {
+                $matrix->save();
+            } catch(Exception $e) {
+                // there is a unique constraint on this table. likely just means this already exists
+                // TODO: update this so it's not in try catch. hard to catch actual issues this way
+            }
+
+            // now I want to update all transactions where the title is 90% or similar to this title
+            // I want to also only update one where the merchant matches so I don't update all where title is empty
+            $db = new StandardQuery();
+            $transactions = $db->rows('SELECT transaction_id, title FROM transactions');
+
+            $toUpdate = [];
+            foreach ($transactions as $trans) {
+
+                // strip number characters... lets only compare alpha
+                $title1 = $this->removeNumbers($trans->title);
+                $title2 = $this->removeNumbers($_POST['title']);
+
+                $similarity = similar_text($title1, $title2, $percent);
+                if ($percent >= $this->similarTitleThreshold) {
+                    $toUpdate[] = $trans->transaction_id;
+                }
+            }
+
+            if (!empty($toUpdate)) {
+                $sql = 'UPDATE transactions SET category_id = ' . $_POST['category_id'] . ' WHERE transaction_id IN (' . implode(',', $toUpdate) . ') ';
+                $db->run($sql);
+            }
+
+        }
+
+
+        HTTP::redirect('/money/transactions');
     }
 
     public function sync()
@@ -31,6 +120,8 @@ class MoneyController extends BaseController
 
         $cursor = $userPlaid->next_cursor;
 
+        $categoryMatrix = CategoryMatrix::find();
+
         do {
 
             $response = $plaid->transactions->sync($decryptedToken, $cursor, null, ['include_personal_finance_category' => true]);
@@ -39,16 +130,20 @@ class MoneyController extends BaseController
 
             foreach ($response->added as $new) {
 
-                // create categories that do not already exist
-                $category = Category::findOne(['detail_desc' => $new->personal_finance_category->detailed]);
-                if (!$category->category_id) {
-                    $category = new Category();
-                    $category->primary_desc = $new->personal_finance_category->primary;
-                    $category->detail_desc = $new->personal_finance_category->detailed;
-                    $category->text_desc = '';
-                    $category->save();
+                foreach ($categoryMatrix as $category) {
+                    if ($category->merchant == $new->merchant_name) {
+                        $categoryId = $category->category_id;
+                        break;
+                    } else {
+                        $title1 = $this->removeNumbers($category->title);
+                        $title2 = $this->removeNumbers($new->name);
+                        $similarity = similar_text($title1, $title2, $percent);
+                        if ($percent >= $this->similarTitleThreshold) {
+                            $categoryId = $category->category_id;
+                            break;
+                        }
+                    }
                 }
-                $categoryId = (int)$category->category_id;
 
                 $transaction = new Transaction();
                 $transaction->user_id = $loggedInUser;
@@ -64,22 +159,11 @@ class MoneyController extends BaseController
 
             foreach ($response->modified as $modified) {
 
-                $category = Category::findOne(['detail_desc' => $new->personal_finance_category->detailed]);
-                if (!$category->category_id) {
-                    $category = new Category();
-                    $category->primary_desc = $new->personal_finance_category->primary;
-                    $category->detail_desc = $new->personal_finance_category->detailed;
-                    $category->text_desc = '';
-                    $category->save();
-                }
-                $categoryId = (int)$category->category_id;
-
                 $transaction = Transaction::findOne(['plaid_id' => $modified->transaction_id]);
                 $transaction->title = $new->name;
                 $transaction->merchant = $new->merchant_name;
                 $transaction->amount = $new->amount;
                 $transaction->date = $new->date;
-                $transaction->category_id = $categoryId;
                 $transaction->save();
 
             }
@@ -128,6 +212,33 @@ class MoneyController extends BaseController
     public function categories()
     {
 
+    }
+
+    public function editCategory($params)
+    {
+        $categoryId = $params['categoryId'] ?? 0;
+        $category = ($categoryId)
+            ? Category::findOne(['category_id' => $categoryId])
+            : new Category();
+
+        $this->view->setVar('category', $category);
+    }
+
+    public function saveCategory()
+    {
+        $this->render = false;
+
+        $categoryId = $_POST['category'] ?? 0;
+        /** @var Category $category */
+        $category = ($categoryId)
+            ? Category::findOne(['category_id' => $categoryId])
+            : new Category();
+
+        $category->primary_desc = $_POST['primary_desc'];
+        $category->detail_desc = $_POST['detail_desc'];
+        $category->save();
+
+        HTTP::redirect('/money/categories');
     }
 
     public function reports()
@@ -220,6 +331,11 @@ class MoneyController extends BaseController
         $encryptedToken = base64_decode($userPlaid->token);
         $iv = base64_decode($userPlaid->iv);
         return openssl_decrypt($encryptedToken, 'AES-256-CBC', $_ENV['ENCRYPT_KEY'], 0, $iv);
+    }
+
+    private function removeNumbers($string)
+    {
+        return preg_replace('/[0-9]/', '', $string);
     }
 
     public function afterAction()
