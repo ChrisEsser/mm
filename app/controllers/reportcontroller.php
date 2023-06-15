@@ -99,7 +99,7 @@ class ReportController extends BaseController
                 $sql = 'select count(amount) as `count`, sum(amount) as `sum`, avg(amount) as `average`, DATE_FORMAT(date, \'%Y-%m\') AS month 
                         from transactions 
                         where merchant = \'' . $merchant . '\' 
-                            and \'' . $start . '\' AND date <= \'' . $end . '\' group by DATE_FORMAT(date, \'%Y-%m\')
+                            and date >= \'' . $start . '\' AND date <= \'' . $end . '\' group by DATE_FORMAT(date, \'%Y-%m\')
                         order by DATE_FORMAT(date, \'%Y-%m\')';
 
                 $series = $db->rows($sql);
