@@ -92,17 +92,17 @@ class ReportController extends BaseController
 
                 $sql = 'select \'\' as `month`, sum(amount) as `sum`, avg(amount) as `average`, count(amount) as `count` 
                         from transactions 
-                        where `date` >= \'' . $start . '\' and `date` <= \'' . $end . '\' and merchant = \'' . $merchant . '\'';
+                        where `date` >= \'' . $start . '\' and `date` <= \'' . $end . '\' and merchant = ?';
 
-                $totals = $db->rows($sql);
+                $totals = $db->rows($sql, [$merchant]);
 
                 $sql = 'select count(amount) as `count`, sum(amount) as `sum`, avg(amount) as `average`, DATE_FORMAT(date, \'%Y-%m\') AS month 
                         from transactions 
-                        where merchant = \'' . $merchant . '\' 
+                        where merchant = ? 
                             and date >= \'' . $start . '\' AND date <= \'' . $end . '\' group by DATE_FORMAT(date, \'%Y-%m\')
                         order by DATE_FORMAT(date, \'%Y-%m\')';
 
-                $series = $db->rows($sql);
+                $series = $db->rows($sql, [$merchant]);
 
                 $data = $totals + $series;
 
