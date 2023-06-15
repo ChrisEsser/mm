@@ -355,7 +355,6 @@
                     colors: undefined
                 }
             },
-            colors: colorPalette,
             title: {
                 text: 'Percent of Spending',
                 align: 'left'
@@ -602,7 +601,6 @@
                     show: false
                 }
             },
-            colors: colorPalette,
             dataLabels: {
                 enabled: false,
             },
