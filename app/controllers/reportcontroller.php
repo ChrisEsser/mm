@@ -102,9 +102,6 @@ class ReportController extends BaseController
                             and \'' . $start . '\' AND date <= \'' . $end . '\' group by DATE_FORMAT(date, \'%Y-%m\')
                         order by DATE_FORMAT(date, \'%Y-%m\')';
 
-                echo $sql;
-                die;
-
                 $series = $db->rows($sql);
 
                 $data = $totals + $series;
