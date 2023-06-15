@@ -255,7 +255,7 @@ class tableData
     updatePaginationDisplay(currentPage, totalPages)
     {
 
-        var numVisiblePages = 11; // Number of visible pages in pagination
+        var numVisiblePages = 7; // Number of visible pages in pagination
 
         let html = '';
         var active = '';
@@ -349,7 +349,7 @@ class tableData
         newHtml += '<div class="row g-3 align-items-center">';
         newHtml += '<div class="col-auto"><label for="' + this.id + '_perPage" class="col-form-label" style="font-weight: 500">Show</label></div>';
         newHtml += '<div class="col-auto">';
-        newHtml += '<select class="form-control" id="' + this.id + '_perPage" style="max-width: 62px">';
+        newHtml += '<select class="form-control" id="' + this.id + '_perPage" style="max-width: 70px">';
 
         let pageLength = (typeof this.config.pageLength == 'number') ? this.config.pageLength : 10;
 
