@@ -106,7 +106,7 @@ class ReportController extends BaseController
                         WHERE date >= \'' . $start . '\' AND date <= \'' . $end . '\' AND merchant = \'' . $merchant . '\'
                         GROUP BY month
                     ) AS t1
-                    INNER JOIN transactions AS t2 ON DATE_FORMAT(t2.date, \'%Y-%m\') <= t1.month
+                    INNER JOIN transactions AS t2 ON DATE_FORMAT(t2.date, \'%Y-%m\') <= t1.month AND merchat = \'' . $merchant . '\'
                     GROUP BY t1.month
                     ORDER BY t1.month';
 
