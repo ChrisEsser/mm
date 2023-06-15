@@ -90,6 +90,12 @@ class ReportController extends BaseController
 
             if ($merchant) {
 
+                $sql = 'SELECT \'\' AS month, AVG(amount) AS `average`, SUM(amount) AS `sum`, COUNT(amount) AS `count`
+                        FROM transactions 
+                        WHERE date >= \'' . $start . '\' AND date <= \'' . $end . '\' AND merchant = \'' . $merchant . '\'';
+
+                $totals = $db->rows($sql);
+
                 $sql = 'SELECT t1.month,
                            AVG(t2.amount) AS average,
                            SUM(t2.amount) AS `sum`,
@@ -97,14 +103,16 @@ class ReportController extends BaseController
                     FROM (
                         SELECT DATE_FORMAT(date, \'%Y-%m\') AS month
                         FROM transactions
-                        WHERE date BETWEEN \'' . $start . '\' AND \'' . $end . '\' AND merchant = \'' . $merchant . '\'
-                        GROUP BY month WITH ROLLUP
+                        WHERE date >= \'' . $start . '\' AND date <= \'' . $end . '\' AND merchant = \'' . $merchant . '\'
+                        GROUP BY month
                     ) AS t1
                     INNER JOIN transactions AS t2 ON DATE_FORMAT(t2.date, \'%Y-%m\') <= t1.month
-                    GROUP BY t1.month WITH ROLLUP
+                    GROUP BY t1.month
                     ORDER BY t1.month';
 
-                $data = $db->rows($sql);
+                $series = $db->rows($sql);
+
+                $data = $totals + $series;
 
             } else if ($title) {
 
