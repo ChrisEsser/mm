@@ -96,19 +96,14 @@ class ReportController extends BaseController
 
                 $totals = $db->rows($sql);
 
-                $sql = 'SELECT t1.month AS `month`,
-                            SUM(t2.amount) AS `sum`,
-                            AVG(t2.amount) AS `average`,                
-                            COUNT(t2.amount) AS `count`
-                    FROM (
-                        SELECT DATE_FORMAT(date, \'%Y-%m\') AS month
-                        FROM transactions
-                        WHERE date >= \'' . $start . '\' AND date <= \'' . $end . '\' AND merchant = \'' . $merchant . '\'
-                        GROUP BY month
-                    ) AS t1
-                    INNER JOIN transactions AS t2 ON DATE_FORMAT(t2.date, \'%Y-%m\') <= t1.month AND merchant = \'' . $merchant . '\'
-                    GROUP BY t1.month
-                    ORDER BY t1.month';
+                $sql = 'select count(amount) as `count`, sum(amount) as `sum`, avg(amount) as `average`, DATE_FORMAT(date, \'%Y-%m\') AS month 
+                        from transactions 
+                        where merchant = \'' . $merchant . '\' 
+                            and \'' . $start . '\' AND date <= \'' . $end . '\' group by DATE_FORMAT(date, \'%Y-%m\')
+                        order by DATE_FORMAT(date, \'%Y-%m\')';
+
+                echo $sql;
+                die;
 
                 $series = $db->rows($sql);
 
