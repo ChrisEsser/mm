@@ -80,6 +80,7 @@ class ReportController extends BaseController
 
         $title = $_GET['title'] ?? '';
         $merchant = $_GET['merchant'] ?? '';
+        $categoryId = $_GET['category'] ?? 0;
 
         try {
 
@@ -88,33 +89,63 @@ class ReportController extends BaseController
             $end = date('Y-m-t'); // Current date
             $start = date('Y-m-01', strtotime('-1 year', strtotime($end)));
 
-            $field = 'merchant';
-            $value = $merchant;
+            $data = [];
 
-            if (!$merchant && $title) {
-                $value = $title;
-                $field = 'title';
-            }
-
-            if ($value) {
+            if ($merchant) {
 
                 $sql = 'select \'\' as `month`, sum(amount) as `sum`, avg(amount) as `average`, count(amount) as `count` 
                         from transactions 
-                        where `date` >= \'' . $start . '\' and `date` <= \'' . $end . '\' and ' . $field . ' = ?';
+                        where `date` >= \'' . $start . '\' and `date` <= \'' . $end . '\' and merchant = ?';
 
-                $totals = $db->rows($sql, [$value]);
+                $totals = $db->rows($sql, [$merchant]);
 
                 $sql = 'select count(amount) as `count`, sum(amount) as `sum`, avg(amount) as `average`, DATE_FORMAT(date, \'%Y-%m\') AS month 
                         from transactions 
-                        where ' . $field . ' = ? 
+                        where merchant = ? 
                             and date >= \'' . $start . '\' AND date <= \'' . $end . '\' group by DATE_FORMAT(date, \'%Y-%m\')
                         order by DATE_FORMAT(date, \'%Y-%m\')';
 
-                $series = $db->rows($sql, [$value]);
+                $series = $db->rows($sql, [$merchant]);
 
                 $data = $totals + $series;
 
-            } else throw new Exception('Invalid request type');
+            } else if ($title) {
+
+                $sql = 'select \'\' as `month`, sum(amount) as `sum`, avg(amount) as `average`, count(amount) as `count` 
+                        from transactions 
+                        where `date` >= \'' . $start . '\' and `date` <= \'' . $end . '\' and title = ?';
+
+                $totals = $db->rows($sql, [$title]);
+
+                $sql = 'select count(amount) as `count`, sum(amount) as `sum`, avg(amount) as `average`, DATE_FORMAT(date, \'%Y-%m\') AS month 
+                        from transactions 
+                        where title = ? 
+                            and date >= \'' . $start . '\' AND date <= \'' . $end . '\' group by DATE_FORMAT(date, \'%Y-%m\')
+                        order by DATE_FORMAT(date, \'%Y-%m\')';
+
+                $series = $db->rows($sql, [$title]);
+
+                $data = $totals + $series;
+
+            } else if ($categoryId) {
+
+                $sql = 'select \'\' as `month`, sum(amount) as `sum`, avg(amount) as `average`, count(amount) as `count` 
+                        from transactions 
+                        where `date` >= \'' . $start . '\' and `date` <= \'' . $end . '\' and category_id = ?';
+
+                $totals = $db->rows($sql, [$categoryId]);
+
+                $sql = 'select count(amount) as `count`, sum(amount) as `sum`, avg(amount) as `average`, DATE_FORMAT(date, \'%Y-%m\') AS month 
+                        from transactions 
+                        where category_id = ? 
+                            and date >= \'' . $start . '\' AND date <= \'' . $end . '\' group by DATE_FORMAT(date, \'%Y-%m\')
+                        order by DATE_FORMAT(date, \'%Y-%m\')';
+
+                $series = $db->rows($sql, [$categoryId]);
+
+                $data = $totals + $series;
+
+            }
 
             $return = [
                 'result' => 'success',

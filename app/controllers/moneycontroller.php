@@ -252,12 +252,14 @@ class MoneyController extends BaseController
     {
         $title = $_GET['title'] ?? '';
         $merchant = $_GET['merchant'] ?? '';
+        $categoryId = $_GET['category'] ?? '';
 
         HTML::addScriptToHead('https://cdn.jsdelivr.net/npm/chart.js');
         HTML::addScriptToHead('https://cdn.jsdelivr.net/npm/apexcharts');
 
         $this->view->setVar('title', $title);
         $this->view->setVar('merchant', $merchant);
+        $this->view->setVar('categoryId', $categoryId);
     }
 
     public function settings()

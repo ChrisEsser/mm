@@ -2,15 +2,35 @@
 
 $title = $this->getVar('title');
 $merchant = $this->getVar('merchant');
+$categoryId = $this->getVar('categoryId');
 
 $end = date('M t Y', time());
 $start = date('M 01 Y', strtotime('-1 year', strtotime($end)));
 
 ?>
 
-<h1 class="page_header"><?=($merchant) ? 'Merchant' : 'Transaction Title'?> Detail Report</h1>
+<h1 class="page_header">
+    <?php if ($merchant) { ?>
+        Merchant
+    <?php } else if ($title) { ?>
+        Transaction Title
+    <?php } else if ($categoryId) { ?>
+        Category
+    <?php } ?>
+    Detail Report
+</h1>
 
-<h5><small><?=($title) ? $title : $merchant?></small></h5>
+<h5>
+    <small>
+        <?php if ($merchant) { ?>
+            <?=$merchant?>
+        <?php } else if ($title) { ?>
+            <?=$title?>
+        <?php } else if ($categoryId) { ?>
+            <?=(Category::findOne(['category_id' => $categoryId]))->detail_desc?>
+        <?php } ?>
+    </small>
+</h5>
 
 <?php if ($title) { ?>
     <p>Note: this report includes all transactions with titles very similar to this title. It may include other transactions.</p>
@@ -79,7 +99,14 @@ $start = date('M 01 Y', strtotime('-1 year', strtotime($end)));
     function loadData() {
 
         let url = '/reports/get-data-detail';
-        url += '?<?=($merchant) ? 'merchant=' . urlencode($merchant) : 'title=' . urlencode($title)?>';
+
+        <?php if ($merchant) { ?>
+            url += '?merchant=<?=urlencode($merchant)?>';
+        <?php } else if ($title) { ?>
+            url += '?title=<?=urlencode($title)?>';
+        <?php } else if ($categoryId) { ?>
+            url += '?category=<?=intval($categoryId)?>';
+        <?php } ?>
 
         $.get(url)
             .done(function(result) {

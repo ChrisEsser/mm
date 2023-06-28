@@ -42,7 +42,8 @@
                 {col: 'title',
                     template: function(data) {
                         if (data.title) {
-                            return '<a href="/money/reports/detail?title=' + encodeURI(data.title) + '">' + data.title + '</a>';
+                            // return '<a href="/money/reports/detail?title=' + encodeURI(data.title) + '">' + data.title + '</a>';
+                            return data.title;
                         } else return '';
                     }
                 },
@@ -54,7 +55,13 @@
                     }
                 },
                 {col: 'amount', format: 'usd'},
-                {col: 'category'},
+                {col: 'category',
+                    template: function(data) {
+                        if (data.category) {
+                            return '<a href="/money/reports/detail?category=' + data.category_id + '">' + data.category + '</a>';
+                        } else return '';
+                    }
+                },
                 {col: '', sort: false, search: false,
                     cellStyle: 'text-align:right;',
                     template: function(data) {

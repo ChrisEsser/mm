@@ -86,7 +86,8 @@ class TableDataController extends BaseController
 
         $db = new StandardQuery();
 
-        $sql = 'SELECT t.transaction_id, t.title, IFNULL(t.merchant, \'\') as merchant, t.amount, t.date, IFNULL(c.detail_desc, \'\') AS category
+        $sql = 'SELECT t.transaction_id, t.title, IFNULL(t.merchant, \'\') as merchant, t.amount, t.date, 
+                       IFNULL(c.detail_desc, \'\') AS category, IFNULL(c.category_id, \'0\') AS category_id
                 FROM transactions t 
                 LEFT JOIN categories c ON c.category_id = t.category_id';
 
