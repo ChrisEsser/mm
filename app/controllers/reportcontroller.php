@@ -87,7 +87,7 @@ class ReportController extends BaseController
                 // category report
                 $sql = 'SELECT t.amount, t.`date`, c.' . $field . ' AS `field`
                         FROM transactions t 
-                        INNER JOIN categoreis c ON c.category_id = t.category_id
+                        INNER JOIN categories c ON c.category_id = t.category_id
                         WHERE t.user_id = ' . Auth::loggedInUser() . '
                             AND `date` >= \'' . $start . '\' AND `date` <= \'' . $end . '\'
                             AND c.' . $field . ' IN (';
