@@ -18,6 +18,7 @@ return [
     ['GET', '/money/sync', 'MoneyController#sync'],
 
     ['GET', '/money/reports', 'MoneyController#reports'],
+    ['GET', '/money/reports2', 'MoneyController#reports2'],
     ['GET', '/money/reports/detail', 'MoneyController#reportDetail'],
 
     ['GET', '/money/settings', 'MoneyController#settings'],
@@ -41,6 +42,7 @@ return [
 
     ['GET', '/reports/get-data', 'ReportController#getData'],
     ['GET', '/reports/get-data-detail', 'ReportController#getDetailData'],
+    ['GET', '/reports/get-data-custom/[i:reportId]', 'ReportController#getCustomData'],
     ['GET', '/reports/manage', 'ReportController#manage'],
     ['GET', '/reports/create', 'ReportController#edit'],
     ['GET', '/reports/edit/[i:reportId]', 'ReportController#edit'],

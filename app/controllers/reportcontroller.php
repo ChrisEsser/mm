@@ -12,6 +12,204 @@ class ReportController extends BaseController
         HTTP::removePageFromHistory();
     }
 
+    public function getCustomData($params)
+    {
+        $this->render = false;
+
+        $return = [
+            'result' => '',
+            'data' => [],
+        ];
+
+        $reportId = $params['reportId'] ?? 0;
+        if (!$reportId) throw new Exception404();
+
+        try {
+
+            /** @var Report $report */
+            $report = Report::findOne(['report_id' => $reportId]);
+
+            $end = date('Y-m-d'); // Current date
+            if ($report->getDetails()->length == '7d') {
+                $start = date('Y-m-d', strtotime('-7 day', strtotime($end)));
+            } else if($report->getDetails()->length == '1m') {
+                $start = date('Y-m-d', strtotime('-1 month', strtotime($end)));
+            } else if($report->getDetails()->length == '1q') {
+                $start = date('Y-m-d', strtotime('-3 month', strtotime($end)));
+            } else if($report->getDetails()->length == '1y') {
+                $start = date('Y-m-d', strtotime('-1 year', strtotime($end)));
+            } else if($report->getDetails()->length == '2y') {
+                $start = date('Y-m-d', strtotime('-2 year', strtotime($end)));
+            } else if($report->getDetails()->length == '3y') {
+                $start = date('Y-m-d', strtotime('-3 year', strtotime($end)));
+            } else if($report->getDetails()->length == 'all') {
+                $start = date('Y-m-d', strtotime('-100 year', strtotime($end)));
+            } else throw new Exception('Invalid length');
+
+            if (!in_array($report->getDetails()->series, ['day', 'month', 'quarter', 'year'])) {
+                throw new Exception('Invalid series grouping');
+            }
+
+            $includes = [];
+            foreach ($report->getDetails()->include as $include) {
+                foreach ($include->list as $item) {
+                    $includes[] = $item;
+                }
+            }
+
+            $db = new StandardQuery();
+
+            if (in_array($report->getDetails()->reporting_on, ['merchant', 'title'])) {
+
+                $field = ($report->getDetails()->reporting_on == 'merchant') ? 'merchant' : 'title';
+
+                // merchant or title report
+                $sql = 'SELECT amount, `date`, ' . $field . ' AS field
+                        FROM transactions 
+                        WHERE user_id = ' . Auth::loggedInUser() . ' 
+                            AND `date` >= \'' . $start . '\' AND `date` <= \'' . $end . '\'
+                            AND ' . $report->getDetails()->reporting_on . ' IN (';
+
+                $sep = '';
+                for($i = 0; $i < count($includes); $i++) {
+                    $sql .= $sep . '?';
+                    $sep = ', ';
+                }
+
+                $sql .= ')';
+
+                $transactions = $db->rows($sql, $includes);
+
+            } else {
+
+                $field = ($report->getDetails()->reporting_on == 'category_primary') ? 'primary_desc' : 'detail_desc';
+
+                // category report
+                $sql = 'SELECT t.amount, t.`date`, c.' . $field . ' AS `field`
+                        FROM transactions t 
+                        INNER JOIN categoreis c ON c.category_id = t.category_id
+                        WHERE t.user_id = ' . Auth::loggedInUser() . '
+                            AND `date` >= \'' . $start . '\' AND `date` <= \'' . $end . '\'
+                            AND c.' . $field . ' IN (';
+
+                $sep = '';
+                for($i = 0; $i < count($includes); $i++) {
+                    $sql .= $sep . '?';
+                    $sep = ', ';
+                }
+
+                $sql .= ')';
+
+                $transactions = $db->rows($sql, $includes);
+
+            }
+
+            $finalData = [];
+
+            if ($report->getDetails()->graph_type == 'pie') {
+
+                // pie graphs are a little different they are just the sum of each group
+
+                foreach ($report->getDetails()->include as $include) {
+
+                    $groupTotal = 0;
+
+                    foreach ($transactions as $transaction) {
+                        if (in_array($transaction->field, $include->list)) {
+                            $groupTotal += $transaction->amount;
+                        }
+                    }
+
+                    $finalData[] = [
+                        'name' => $include->alias,
+                        'data' => $groupTotal
+                    ];
+
+                }
+
+            } else {
+
+                // line and bar graphs have grouped data that are grouped by time chunks
+
+                foreach ($report->getDetails()->include as $include) {
+
+                    $groupTotal = 0;
+                    $tmpGroupTotals = [];
+
+                    if ($report->getDetails()->series == 'day') {
+                        $dateRange = new DatePeriod(new DateTime($start), new DateInterval('P1D'), new DateTime($end));
+                        foreach ($dateRange as $date) {
+                            $key = $date->format('m/d/Y');
+                            $tmpGroupTotals[$key] = 0;
+                        }
+                    } else if ($report->getDetails()->series == 'month') {
+                        $dateRange = new DatePeriod(new DateTime($start), new DateInterval('P1D'), new DateTime($end));
+                        foreach ($dateRange as $date) {
+                            $key = $date->format('m/Y');
+                            $tmpGroupTotals[$key] = 0;
+                        }
+                    } else if ($report->getDetails()->series == 'quarter') {
+                        $dateRange = new DatePeriod(new DateTime($start), new DateInterval('P3M'), new DateTime($end));
+                        foreach ($dateRange as $date) {
+                            $key = 'Q' . ceil($date->format('n') / 3) . ' ' . $date->format('Y');
+                            $tmpGroupTotals[$key] = 0;
+                        }
+                    } else if ($report->getDetails()->series == 'year') {
+                        $dateRange = new DatePeriod(new DateTime($start), new DateInterval('P1Y'), new DateTime($end));
+                        foreach ($dateRange as $date) {
+                            $key = $date->format('Y');
+                            $tmpGroupTotals[$key] = 0;
+                        }
+                    }
+
+                    foreach ($transactions as $transaction) {
+
+                        if (in_array($transaction->field, $include->list)) {
+
+                            if ($report->getDetails()->series == 'day') {
+                                $date = date('m/d/Y', strtotime($transaction->date));
+                            } else if ($report->getDetails()->series == 'month') {
+                                $date = date('m/Y', strtotime($transaction->date));
+                            } else if ($report->getDetails()->series == 'quarter') {
+                                $tmpDate = new DateTime($transaction->date);
+                                $quarter = ceil($tmpDate->format('n') / 3);
+                                $year = $tmpDate->format('Y');
+                                $date = 'Q' . $quarter . ' ' . $year;
+                            } else if ($report->getDetails()->series == 'year') {
+                                $date = date('Y', strtotime($transaction->date));
+                            }
+
+                            $tmpGroupTotals[$date] += $transaction->amount;
+
+                        }
+
+                    }
+
+                    $finalData[] = [
+                        'name' => $include->alias,
+                        'data' => $tmpGroupTotals,
+                    ];
+
+                }
+
+            }
+
+            $return = [
+                'result' => 'success',
+                'data' => $finalData,
+            ];
+
+        } catch (Exception $e) {
+            $return = [
+                'result' => 'error',
+                'error_message' => $e->getMessage(),
+            ];
+        }
+
+        echo json_encode($return);
+        exit;
+    }
+
     public function getData()
     {
         $this->render = false;

@@ -248,6 +248,16 @@ class MoneyController extends BaseController
         HTML::addScriptToHead('https://cdn.jsdelivr.net/npm/apexcharts');
     }
 
+    public function reports2()
+    {
+        HTML::addScriptToHead('https://cdn.jsdelivr.net/npm/chart.js');
+        HTML::addScriptToHead('https://cdn.jsdelivr.net/npm/apexcharts');
+
+        $reports = Report::find(['user_id' => Auth::loggedInUser()], ['sort_order' => 'ASC']);
+
+        $this->view->setVar('reports', $reports);
+    }
+
     public function reportDetail()
     {
         $title = $_GET['title'] ?? '';
