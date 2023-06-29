@@ -2,7 +2,7 @@
 
 class TableDataController extends BaseController
 {
-    protected $pageLength = 2;
+    protected $pageLength = 10;
     protected $page = 1;
     protected $filters = [];
     protected $sort = [];
@@ -157,6 +157,156 @@ class TableDataController extends BaseController
         foreach ($this->sort as $sort) {
             foreach ($sort as $col => $dir) {
                 if (in_array($col, ['primary_desc', 'detail_desc', 'text_desc'])) {
+                    $order[$col] = $col . ' ' . $dir;
+                }
+            }
+        }
+
+        $whereString = (!empty($where)) ? ' WHERE ' . implode(' AND ', $where) : '';
+        $sql .= ' ' . $whereString;
+
+        $total = $db->count($sql, $params);
+        $totalPages = ceil($total / $this->pageLength);
+
+        $orderString = (!empty($order)) ? ' ORDER BY ' . implode(', ', $order) : '';
+        $sql .= ' ' . $orderString;
+
+        $sql .= ' LIMIT ' . $this->offset . ', ' . $this->pageLength;
+
+        $data = $db->rows($sql, $params);
+
+        echo json_encode([
+            'total' => $total,
+            'pages' => $totalPages,
+            'page' => $this->page,
+            'data' => $data,
+        ]);
+    }
+
+    public function reports()
+    {
+        $where = $order = [];
+
+        $db = new StandardQuery();
+
+        $sql = 'SELECT r.*
+                FROM user_reports r ';
+
+        $where['user_id'] = 'r.user_id = ' . Auth::loggedInUser();
+
+        $params = [];
+        foreach ($this->filters as $filter) {
+            foreach ($filter as $col => $value) {
+                if (in_array($col, ['title', 'type'])) {
+                    $where[$col] = 'r.' . $col . ' LIKE :' . $col;
+                    $params[$col] = '%' . $value . '%';
+                }
+            }
+        }
+
+        foreach ($this->sort as $sort) {
+            foreach ($sort as $col => $dir) {
+                if (in_array($col, ['title', 'type', 'sort_order', 'size'])) {
+                    $order[$col] = $col . ' ' . $dir;
+                }
+            }
+        }
+
+        $whereString = (!empty($where)) ? ' WHERE ' . implode(' AND ', $where) : '';
+        $sql .= ' ' . $whereString;
+
+        $total = $db->count($sql, $params);
+        $totalPages = ceil($total / $this->pageLength);
+
+        $orderString = (!empty($order)) ? ' ORDER BY ' . implode(', ', $order) : '';
+        $sql .= ' ' . $orderString;
+
+        $sql .= ' LIMIT ' . $this->offset . ', ' . $this->pageLength;
+
+        $data = $db->rows($sql, $params);
+
+        echo json_encode([
+            'total' => $total,
+            'pages' => $totalPages,
+            'page' => $this->page,
+            'data' => $data,
+        ]);
+    }
+
+    public function merchants()
+    {
+        $where = $order = [];
+
+        $db = new StandardQuery();
+
+        $sql = 'SELECT DISTINCT merchant FROM transactions';
+
+        $where['user_id'] = 'user_id = ' . Auth::loggedInUser();
+        $where['merchant'] = 'merchant <> \'\'';
+
+        $params = [];
+        foreach ($this->filters as $filter) {
+            foreach ($filter as $col => $value) {
+                if (in_array($col, ['merchant']) && !empty($value)) {
+                    $where[$col] = $col . ' LIKE :' . $col;
+                    $params[$col] = '%' . $value . '%';
+                }
+            }
+        }
+
+        foreach ($this->sort as $sort) {
+            foreach ($sort as $col => $dir) {
+                if (in_array($col, ['merchant'])) {
+                    $order[$col] = $col . ' ' . $dir;
+                }
+            }
+        }
+
+        $whereString = (!empty($where)) ? ' WHERE ' . implode(' AND ', $where) : '';
+        $sql .= ' ' . $whereString;
+
+        $total = $db->count($sql, $params);
+        $totalPages = ceil($total / $this->pageLength);
+
+        $orderString = (!empty($order)) ? ' ORDER BY ' . implode(', ', $order) : '';
+        $sql .= ' ' . $orderString;
+
+        $sql .= ' LIMIT ' . $this->offset . ', ' . $this->pageLength;
+
+        $data = $db->rows($sql, $params);
+
+        echo json_encode([
+            'total' => $total,
+            'pages' => $totalPages,
+            'page' => $this->page,
+            'data' => $data,
+        ]);
+    }
+
+    public function titles()
+    {
+        $where = $order = [];
+
+        $db = new StandardQuery();
+
+        $sql = 'SELECT DISTINCT title FROM transactions';
+
+        $where['user_id'] = 'user_id = ' . Auth::loggedInUser();
+        $where['title'] = 'title <> \'\'';
+
+        $params = [];
+        foreach ($this->filters as $filter) {
+            foreach ($filter as $col => $value) {
+                if (in_array($col, ['title']) && !empty($value)) {
+                    $where[$col] = $col . ' LIKE :' . $col;
+                    $params[$col] = '%' . $value . '%';
+                }
+            }
+        }
+
+        foreach ($this->sort as $sort) {
+            foreach ($sort as $col => $dir) {
+                if (in_array($col, ['title'])) {
                     $order[$col] = $col . ' ' . $dir;
                 }
             }

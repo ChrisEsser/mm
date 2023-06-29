@@ -4,6 +4,10 @@
 
 <h1 class="page_header">Reports</h1>
 
+<div class="d-grid gap-2 d-md-flex my-3 justify-content-md-end">
+    <a href="/reports/manage" role="button" class="btn btn-round btn-primary"><i class="bi bi-cogs"></i>&nbsp;&nbsp;Manage My Reports</a>
+</div>
+
 <div class="mb-4">
 
     <div class="row">
@@ -79,19 +83,6 @@
             </div>
         </div>
     </div>
-
-<!--    <div class="row mt-4 mb-4">-->
-<!--        <div class="col-md-6">-->
-<!--            <div class="box">-->
-<!--                <div id="area"></div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        <div class="col-md-6">-->
-<!--            <div class="box">-->
-<!--                <div id="line"></div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
 
 </div>
 

@@ -9,7 +9,6 @@ class ReportController extends BaseController
             throw new Exception404();
         }
 
-        $this->render = false;
         HTTP::removePageFromHistory();
     }
 
@@ -161,6 +160,56 @@ class ReportController extends BaseController
 
         echo json_encode($return);
         exit;
+    }
+
+    public function manage()
+    {
+
+    }
+
+    public function edit($params)
+    {
+        $reportId = $params['reportId'] ?? 0;
+        $report = ($reportId)
+            ? Report::findOne(['report_id' => $reportId])
+            : new Report();
+
+        $countReports = Report::find(['user_id' => Auth::loggedInUser()])->count();
+
+        $this->view->setVar('report', $report);
+        $this->view->setVar('countReports', $countReports);
+    }
+
+    public function save()
+    {
+        $this->render = false;
+
+        $reportId = $_POST['report'] ?? 0;
+        $report = ($reportId)
+            ? Report::findOne(['report_id' => $reportId])
+            : new Report();
+
+        $report->details = base64_encode(json_encode($_POST['details']));
+        $report->user_id = Auth::loggedInUser();
+        $report->sort_order = $_POST['sort_order'];
+        $report->size = $_POST['size'];
+        $report->title = $_POST['title'];
+
+        $report->save();
+
+        HTTP::redirect('/reports/manage');
+    }
+
+    public function delete($parames)
+    {
+        $this->render = false;
+
+        $reportId = $parames['reportId'] ?? 0;
+        if (!$reportId) throw new Exception404();
+
+        Report::findOne(['report_id' => $reportId])->delete();
+
+        HTTP::redirect('/reports/manage');
     }
 
     private function getBalance($start, $end, $mode)
@@ -411,6 +460,22 @@ class ReportController extends BaseController
 
             return $months;
 
+        }
+    }
+
+    public function afterAction()
+    {
+        if (!$this->render_header) {
+            $layout = new AjaxLayout();
+            $layout->action = $this->_action;
+            $layout->addTemplate($this->view);
+            $layout->display();
+        }
+        else if ($this->render) {
+            $layout = new AdminLayout();
+            $layout->action = $this->_action;
+            $layout->addTemplate($this->view);
+            $layout->display();
         }
     }
 

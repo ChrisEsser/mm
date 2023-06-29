@@ -35,8 +35,16 @@ return [
     ['POST', '/app-data/users', 'TableDataController#users'],
     ['POST', '/app-data/categories', 'TableDataController#categories'],
     ['POST', '/app-data/transactions', 'TableDataController#transactions'],
+    ['POST', '/app-data/reports', 'TableDataController#reports'],
+    ['POST', '/app-data/merchants', 'TableDataController#merchants'],
+    ['POST', '/app-data/titles', 'TableDataController#titles'],
 
     ['GET', '/reports/get-data', 'ReportController#getData'],
     ['GET', '/reports/get-data-detail', 'ReportController#getDetailData'],
+    ['GET', '/reports/manage', 'ReportController#manage'],
+    ['GET', '/reports/create', 'ReportController#edit'],
+    ['GET', '/reports/edit/[i:reportId]', 'ReportController#edit'],
+    ['POST', '/reports/save', 'ReportController#save'],
+    ['POST', '/reports/delete/[i:reportId]', 'ReportController#delete'],
 
 ];
