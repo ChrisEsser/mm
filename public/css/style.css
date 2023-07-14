@@ -309,6 +309,20 @@ ul.pagination {
     padding: 5px 5px 5px 5px;
     height: 100%;
 }
+.chart_box_outer {
+    box-shadow: 0px 1px 22px -12px #607D8B;
+    background-color: #fff;
+    padding: 5px 5px 5px 5px;
+    height: 100%;
+}
+.chart_box_inner {
+
+}
+.chart_box_controls {
+    margin-bottom: 5px;
+    padding: 5px;
+}
+
 /* END REPORT CHART STYLES */
 
 

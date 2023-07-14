@@ -17,6 +17,7 @@ $countReports = $this->getVar('countReports');
 <form method="POST" action="/reports/save">
 
     <input type="hidden" name="report" id="report" value="<?=$report->report_id?>" />
+    <input type="hidden" name="sort_order" id="sort_order" value="<?=intval($report->sort_order)?>" />
 
     <div class="row">
 
@@ -61,21 +62,6 @@ $countReports = $this->getVar('countReports');
             </select>
             <div id="sizeHelp" class="form-text">This is a fraction of screen width pn larger screens. Small devices will always stack.</div>
         </div>
-
-        <?php if ($countReports) { ?>
-            <div class="mb-3 col-sm-4">
-                <label for="sort_order" class="form-label">Sort Order</label>
-                <select class="form-control" id="sort_order" name="sort_order">
-                    <?php for ($i = 0; $i < $countReports; $i++) { ?>
-                        <option value="<?=$i?>" <?=($i == $report->sort_order) ? 'selected' : ''?>><?=$i+1?></option>
-                    <?php } ?>
-                    <option value="<?=$i?>" <?=($report->sort_order == '') ? 'selected' : ''?>><?=$i+1?></option>
-                </select>
-                <div id="sizeHelp" class="form-text">The order in which the graph will display. New graphs default to last, but you can change that to make it display higher up the screen.</div>
-            </div>
-        <?php } else { ?>
-            <input type="hidden" name="sort_order" value="0" />
-        <?php } ?>
 
         <div class="mb-3 col-sm-4">
             <label for="series" class="form-label">Series</label>

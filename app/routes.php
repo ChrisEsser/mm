@@ -5,6 +5,8 @@ return [
     ['GET', '/', 'IndexController#index'],
     ['GET', '', 'IndexController#index'],
 
+    ['GET', '/test', 'IndexController#test'],
+
     ['GET', '/money/transactions', 'MoneyController#transactions'],
     ['GET', '/money/transactions/create', 'MoneyController#editTransaction'],
     ['GET', '/money/transactions/edit/[i:transactionId]', 'MoneyController#editTransaction'],
@@ -48,5 +50,6 @@ return [
     ['GET', '/reports/edit/[i:reportId]', 'ReportController#edit'],
     ['POST', '/reports/save', 'ReportController#save'],
     ['POST', '/reports/delete/[i:reportId]', 'ReportController#delete'],
+    ['POST', '/reports/sort', 'ReportController#sort'],
 
 ];

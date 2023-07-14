@@ -5,6 +5,7 @@
 <h1 class="page_header">Reports</h1>
 
 <div class="d-grid gap-2 d-md-flex my-3 justify-content-md-end">
+    <a href="/money/reports2" role="button" class="btn btn-round btn-primary"><i class="bi bi-eye"></i>&nbsp;&nbsp;View My Reports</a>
     <a href="/reports/manage" role="button" class="btn btn-round btn-primary"><i class="bi bi-cogs"></i>&nbsp;&nbsp;Manage My Reports</a>
 </div>
 

@@ -8,16 +8,23 @@ $reports = $this->getVar('reports');
 <h1 class="page_header">Reports</h1>
 
 <div class="d-grid gap-2 d-md-flex my-3 justify-content-md-end">
+    <a href="/money/reports" role="button" class="btn btn-round btn-primary"><i class="bi bi-arrow-left"></i>&nbsp;&nbsp;Back to Default Reports</a>
     <a href="/reports/manage" role="button" class="btn btn-round btn-primary"><i class="bi bi-cogs"></i>&nbsp;&nbsp;Manage My Reports</a>
 </div>
 
 
-<div class="row d-flex">
+<div class="row d-flex sortable">
     <?php foreach ($reports as $report) { ?>
-
-        <div class="mb-2 col-sm-<?=$report->size?>">
-            <div class="box">
-                <div id="report_<?=$report->report_id?>"></div>
+        <div class=" mb-2 col-sm-<?=$report->size?> sortable-item" data-report="<?=$report->report_id?>">
+            <div class="chart_box_outer">
+                <div class="chart_box_inner">
+                    <div class="chart_box_controls d-flex align-items-center justify-content-md-end">
+                        <a href="/reports/edit/<?=$report->report_id?>" class="btn btn-sm" title="edit report"><i class="bi bi-pencil"></i></a>
+                        <span class="btn btn-sm sortable_handle" title="move report"><i class="bi bi-arrows-move"></i></span>
+                        <button type="button" class="btn btn-sm confirm_trigger" data-url="/reports/delete/<?=$report->report_id?>" data-title="Confirm Delete" data-message="Are you sure you want to delete this report?" title="delete report"><i class="bi bi-x"></i></button>
+                    </div>
+                    <div id="report_<?=$report->report_id?>"></div>
+                </div>
             </div>
         </div>
 
@@ -149,5 +156,24 @@ $reports = $this->getVar('reports');
         <?php } ?>
 
     }
+
+    $(document).ready(function() {
+
+        $('.sortable').sortable({
+            handle: '.sortable_handle',
+            stop: function(event, ui) {
+                let reportList = [];
+                $('.sortable-item').each(function() {
+                    reportList.push($(this).data('report'));
+                });
+                $.post('/reports/sort', {reportList: reportList}).done(function(response) {
+
+                });
+            }
+        });
+        $('.sortable').disableSelection();
+
+    });
+
 
 </script>

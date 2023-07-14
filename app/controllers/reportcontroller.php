@@ -410,6 +410,30 @@ class ReportController extends BaseController
         HTTP::redirect('/reports/manage');
     }
 
+    public function sort()
+    {
+        $this->render = false;
+
+        $loggedInUser = intval(Auth::loggedInUser());
+
+        if (!empty($_POST['reportList'])) {
+
+            $db = new StandardQuery();
+            $sql = 'UPDATE user_reports SET sort_order = 0 WHERE user_id <> 0 AND user_id = ' . $loggedInUser;
+            $db->run($sql);
+
+            $sql = '';
+            for ($i = 1; $i <= count($_POST['reportList']); $i++) {
+                $sql .= 'UPDATE user_reports SET sort_order = ' . $i . ' WHERE user_id = ' . $loggedInUser . ' AND report_id = ' . intval($_POST['reportList'][$i]) . ';' . "\n\r";
+            }
+
+            $db->run($sql);
+
+        }
+
+        exit();
+    }
+
     private function getBalance($start, $end, $mode)
     {
         $db = new StandardQuery();
