@@ -253,6 +253,7 @@ class MoneyController extends BaseController
         HTML::addScriptToHead('https://cdn.jsdelivr.net/npm/chart.js');
         HTML::addScriptToHead('https://cdn.jsdelivr.net/npm/apexcharts');
         HTML::addScriptToHead('https://code.jquery.com/ui/1.13.2/jquery-ui.js');
+        HTML::addScriptToHead('/js/touch-punch-min.js');
 
         $reports = Report::find(['user_id' => Auth::loggedInUser()], ['sort_order' => 'ASC']);
 

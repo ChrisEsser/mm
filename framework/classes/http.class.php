@@ -10,7 +10,6 @@ class HTTP
 
     public static function rewind($stepsBack = 0)
     {
-
         $tmpRewind = &$_SESSION['framework']['http']['rewind'];
         if (empty($tmpRewind)) self::noHistoryRewind();
 
