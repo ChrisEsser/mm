@@ -400,6 +400,7 @@ class ReportController extends BaseController
 
     public function delete($parames)
     {
+        HTTP::removePageFromHistory();
         $this->render = false;
 
         $reportId = $parames['reportId'] ?? 0;
@@ -407,7 +408,7 @@ class ReportController extends BaseController
 
         Report::findOne(['report_id' => $reportId])->delete();
 
-        HTTP::redirect('/reports/manage');
+        HTTP::rewind();
     }
 
     public function sort()
